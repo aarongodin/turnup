@@ -1,0 +1,7 @@
+langauge: node_js
+node_js:
+  - "9"
+  - "8"
+script:
+  - npm run lint
+  - npm test

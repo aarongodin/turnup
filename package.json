@@ -1,0 +1,38 @@
+{
+  "name": "turnup",
+  "version": "0.1.0",
+  "description": "Manage NPM dependencies across a multi-repo arch",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "bin": {
+    "turnup": "./cli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aarongodin/turnup.git"
+  },
+  "keywords": [
+    "npm",
+    "dependency",
+    "turnup",
+    "multi-repo"
+  ],
+  "author": "Aaron Godin <godinaaweb@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aarongodin/turnup/issues"
+  },
+  "homepage": "https://github.com/aarongodin/turnup#readme",
+  "dependencies": {
+    "inquirer": "5.1.0",
+    "yargs": "11.0.0"
+  },
+  "devDependencies": {
+    "eslint": "4.18.2",
+    "eslint-plugin-jest": "^21.15.0",
+    "jest": "23.0.0-alpha.0"
+  }
+}
