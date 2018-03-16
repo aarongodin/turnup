@@ -2,5 +2,5 @@ langauge: node_js
 install:
   - yarn
 script:
-  - npm run lint
-  - npm test
+  - yarn run lint
+  - yarn test
