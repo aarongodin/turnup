@@ -1,7 +1,6 @@
 langauge: node_js
-node_js:
-  - "9"
-  - "8"
+install:
+  - yarn
 script:
   - npm run lint
   - npm test
