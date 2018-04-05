@@ -73,9 +73,7 @@ Generating lockfiles (`package-lock.json`, `yarn.lock`) is the default functiona
 
 ### Node Versions
 
-An edge case for generating a lockfile is that using two different versions of Node or npm *could* lead to the lockfile to change, even if `package.json` did not. Turnup makes a few efforts to avoid this.
-
-1. If an `.npmrc` file is present in the target repo, turnup will try to generate the lockfile using that node version if it exists on your machine.
+An edge case for generating a lockfile is that using two different versions of Node or npm *could* lead to the lockfile to change, even if `package.json` did not. If an `.npmrc` file is present in the target repo, turnup will generate the lockfile using the specified node version if it exists on your machine.
 
 ### Yarn
 
