@@ -1,6 +1,6 @@
 {
   "name": "turnup",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0",
   "description": "Manage NPM dependencies across a multi-repo arch",
   "main": "index.js",
   "scripts": {
