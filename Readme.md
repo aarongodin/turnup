@@ -64,7 +64,7 @@ A required option is any option that specifies target repositories.
 | option    | short | description                                 |
 |-----------|-------|---------------------------------------------|
 | `--repos` | `-r`  | Array of full repository names (owner/name) |
-| `--owner` | `-o`  | Single owner to update repositories for     |
+| `--owner` | `-o`  | Single owner to find repositories           |
 
 ### Lockfiles
 
