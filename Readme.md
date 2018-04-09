@@ -93,8 +93,8 @@ This is just for my own sake right now while I build out turnup's first minor ve
   - ~~Change the repos positional arg to be optional~~
   - Accept tags in the way that `npm install` does
   - Handle yarn
-  - Accept `--no-lockfile` option
-  - Accept `--no-pr` option
+  - ~~Accept `--no-lockfile` option~~
+  - ~~Accept `--no-pr` option~~
 - GitLab adapter
 - Bitbucket adapter
 - Allow configuring the remote URL base for an adapter

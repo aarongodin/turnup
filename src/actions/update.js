@@ -18,8 +18,9 @@ const promptUserForRepos = repos => inquirer.prompt([{
   pageSize: 20
 }])
 
-const updateRepository = async (adapter, repository, packageName, packageVersion) => {
+const updateRepository = async (adapter, repository, packageName, packageVersion, options = {}) => {
   notify(ACTION, `Updating ${chalk.italic(repository.fullName)}`)
+
   const branchName = `turnup/${packageName}@${packageVersion}`
   const packageDef = repository.packageDefinition.decoded
 
@@ -31,8 +32,12 @@ const updateRepository = async (adapter, repository, packageName, packageVersion
 
   const formattedPackageDef = await formatPackage(packageDef)
 
-  notify(ACTION, 'Generating lockfile.')
-  const lockFile = await packages.lockfile.create(formattedPackageDef)
+  let lockFile
+
+  if (!options.noLockfile) {
+    notify(ACTION, 'Generating lockfile.')
+    lockFile = await packages.lockfile.create(formattedPackageDef)
+  }
 
   notify(ACTION, 'Creating branch.')
   await adapter.createBranch(repository, branchName)
@@ -40,8 +45,10 @@ const updateRepository = async (adapter, repository, packageName, packageVersion
   notify(ACTION, 'Creating commit.')
   await adapter.commitPackageDefinition(repository, branchName, formattedPackageDef, lockFile)
 
-  notify(ACTION, 'Creating pull request.')
-  await adapter.createPullRequest(repository, branchName)
+  if (!options.noPullRequest) {
+    notify(ACTION, 'Creating pull request.')
+    await adapter.createPullRequest(repository, branchName)
+  }
 }
 
 module.exports = async (packageString, adapter, options = {}) => {
@@ -100,7 +107,7 @@ module.exports = async (packageString, adapter, options = {}) => {
       notify(ACTION, `Updating ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} with ${chalk.bold(packageString)}`)
     }
 
-    await promisify(async.series).call(this, repositories.map(repository => updateRepository.bind(this, adapter, repository, parsedPackage.name, parsedPackage.version)).toJS())
+    await promisify(async.series).call(this, repositories.map(repository => updateRepository.bind(this, adapter, repository, parsedPackage.name, parsedPackage.version, options)).toJS())
   } catch (err) {
     console.error(err)
     fatal(ACTION, err)

@@ -6,7 +6,7 @@ const { fatal, errorTypes } = require('./errors')
 const checkUpdateArgs = argv => {
   const ownerRegex = /^[a-zA-Z\d-_]{2,}$/
   const repoRegex = /^[a-zA-Z\d-_]{2,}\/[a-zA-Z\d-_]{2,}$/
-  const notPresent = argv.repos === undefined && argv.owners === undefined
+  const notPresent = argv.repos === undefined && argv.owner === undefined
 
   if (notPresent) {
     fatal('turnup.preCommand', new errorTypes.RepositoriesNotProvidedError())
@@ -17,7 +17,7 @@ const checkUpdateArgs = argv => {
   }
 
   if (argv.owner && !ownerRegex.test(argv.owner)) {
-    fatal('turn.preCommand', new errorTypes.InvalidTargetRepositoriesOptionError())
+    fatal('turn.preCommand', new errorTypes.InvalidTargetOwnerOptionError())
   }
 }
 
@@ -82,6 +82,16 @@ require('yargs')
         describe: 'specify an adapter',
         choices: adapters.types
       })
+
+      yargs.option('no-pr', {
+        describe: 'do not create a pull request',
+        type: 'boolean'
+      })
+
+      yargs.option('no-lockfile', {
+        describe: 'do not update the lockfile',
+        type: 'boolean'
+      })
     },
     async argv => {
       checkUpdateArgs(argv)
@@ -94,6 +104,14 @@ require('yargs')
 
       if (argv.owner) {
         options.owner = argv.owner
+      }
+
+      if (argv['no-pr']) {
+        options.noPullRequest = true
+      }
+
+      if (argv['no-lockfile']) {
+        options.noLockfile = true
       }
 
       actions.update(argv.package, adapter, options)

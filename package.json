@@ -20,6 +20,9 @@
     "turnup",
     "multi-repo"
   ],
+  "yargs": {
+    "boolean-negation": false
+  },
   "author": "Aaron Godin <godinaaweb@gmail.com>",
   "license": "MIT",
   "bugs": {
