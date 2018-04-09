@@ -61,10 +61,10 @@ The `update` command accepts a single argument with many options. The first argu
 
 A required option is any option that specifies target repositories.
 
-| option     | short | description                                 |
-|------------|-------|---------------------------------------------|
-| `--repos`  | `-r`  | Array of full repository names (owner/name) |
-| `--owners` | `-o`  | Array of owners to update repositories for  |
+| option    | short | description                                 |
+|-----------|-------|---------------------------------------------|
+| `--repos` | `-r`  | Array of full repository names (owner/name) |
+| `--owner` | `-o`  | Single owner to update repositories for     |
 
 ### Lockfiles
 
