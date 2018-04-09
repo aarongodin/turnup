@@ -1,8 +1,4 @@
-const c = require('colors/safe')
-
-c.setTheme({
-  command: ['yellow', 'italic']
-})
+const chalk = require('chalk')
 
 class InvalidPackageVersionError extends Error {
   constructor(...args) {
@@ -28,7 +24,7 @@ class AdapterNotConfiguredError extends Error {
 class AdapterNotProvidedError extends Error {
   constructor(...args) {
     super(...args)
-    this.message = `Adapter not specified. Use the -a flag, or specify a default adapter using ${c.command("turnup adapter default")}.`
+    this.message = `Adapter not specified. Use the -a flag, or specify a default adapter using ${chalk.yellow.italic("turnup adapter default")}.`
   }
 }
 
@@ -39,19 +35,43 @@ class ValidTokenNotProvidedError extends Error {
   }
 }
 
+class RepositoriesNotProvidedError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.message = `An option for target repos must be passed (${chalk.yellow.italic("--owner")} or ${chalk.yellow.italic("--repos")})`
+  }
+}
+
+class InvalidTargetRepositoriesOptionError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.message = `The ${chalk.yellow.italic("repos")} option requires repository full names in the format ${chalk.yellow.italic("<owner>/<repo>")}`
+  }
+}
+
+class InvalidTargetOwnerOptionError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.message = `The ${chalk.yellow.italic("owner")} option requires owner names in the format ${chalk.yellow.italic("<owner>")} (no repository name)`
+  }
+}
+
 const errorTypes = {
   InvalidPackageVersionError,
   NoRepositoriesFoundError,
   AdapterNotConfiguredError,
   AdapterNotProvidedError,
-  ValidTokenNotProvidedError
+  ValidTokenNotProvidedError,
+  RepositoriesNotProvidedError,
+  InvalidTargetRepositoriesOptionError,
+  InvalidTargetOwnerOptionError
 }
 
 const fatal = (action, err) => {
   if (Object.values(errorTypes).some(t => err instanceof t)) {
-    console.log(`[${c.bold(action)}] Error! ${c.red(err.message)}`)
+    console.log(`[${chalk.bold(action)}] Error! ${chalk.red(err.message)}`)
   } else {
-    console.log(`[${c.bold(action)}] Unexpected Error! This may be an issue with turnup. ${c.red(err.message)}`)
+    console.log(`[${chalk.bold(action)}] Unexpected Error! This may be an issue with turnup. ${chalk.red(err.message)}`)
   }
   process.exit(1)
 }

@@ -24,6 +24,22 @@ class Api {
     return JSON.parse(raw)
   }
 
+  async getUserRepos(user) {
+    const raw = await request.get(this.buildUrl(`/users/${user}/repos`), {
+      headers: this.getHeaders()
+    })
+
+    return JSON.parse(raw)
+  }
+
+  async getOrgRepos(org) {
+    const raw = await request.get(this.buildUrl(`/orgs/${org}/repos`), {
+      headers: this.getHeaders()
+    })
+
+    return JSON.parse(raw)
+  }
+
   async getContents(repoFullName, path) {
     const raw = await request.get(this.buildUrl(`/repos/${repoFullName}/contents/${path}`), {
       headers: this.getHeaders()

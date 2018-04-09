@@ -28,7 +28,7 @@ const needsUpgrade = (currentVersion, desiredVersion) => {
 
 const repositoriesByDependencyUpgrade = (repositories, packageName, packageVersion) => {
   return repositories.map(repo => {
-    if (repo.packageDefinition.decoded === undefined) {
+    if (!repo.packageDefinition || !repo.packageDefinition.decoded) {
       return undefined
     }
 

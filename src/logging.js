@@ -1,7 +1,7 @@
-const c = require('colors/safe')
+const chalk = require('chalk')
 
 const notify = (action, message) => {
-  console.log(`[${c.bold(action)}] ${c.blue(message)}`)
+  console.log(`[${chalk.bold(action)}] ${chalk.blue(message)}`)
 }
 
 module.exports = {

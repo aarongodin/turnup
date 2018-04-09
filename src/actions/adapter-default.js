@@ -8,5 +8,5 @@ module.exports = async (adapter) => {
   const c = await globalConfig.load()
   _set(c, 'adapters.default', adapter.getKey())
   await globalConfig.save(c)
-  notify(ACTION, `Default global adapter is now ${adapter.getKey()}.`)
+  notify(ACTION, `Default global adapter is now ${adapter.getName()}.`)
 }

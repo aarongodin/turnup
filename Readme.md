@@ -59,21 +59,16 @@ The `update` command accepts a single argument with many options. The first argu
 1. A name and version number, as in what you would type into `npm install`. Ex: `turnup update webpack@4.5.0`
 2. A path to a local directory containing a `package.json`. Ex: `turnup update .` (useful if you have just published a new version of the package in the current directory)
 
-A required option is any option that specifies a single repo or set of repos.
+A required option is any option that specifies target repositories.
 
-| option    | short | description                                     |
-|-----------|-------|-------------------------------------------------|
-| `--repos` | `-r`  | A comma-separated list of full repository names |
-| `--owner` | `-o`  | A single owner to update all repos for          |
-|           |       |                                                 |
+| option     | short | description                                 |
+|------------|-------|---------------------------------------------|
+| `--repos`  | `-r`  | Array of full repository names (owner/name) |
+| `--owners` | `-o`  | Array of owners to update repositories for  |
 
 ### Lockfiles
 
 Generating lockfiles (`package-lock.json`, `yarn.lock`) is the default functionality of the `update` command but can be turned off through the `--no-lockfile` option. Lockfiles are also only generated if it already exists in the repository.
-
-### Node Versions
-
-An edge case for generating a lockfile is that using two different versions of Node or npm *could* lead to the lockfile to change, even if `package.json` did not. If an `.npmrc` file is present in the target repo, turnup will generate the lockfile using the specified node version if it exists on your machine.
 
 ### Yarn
 
@@ -94,12 +89,13 @@ This is just for my own sake right now while I build out turnup's first minor ve
 - 100% test coverage
 - `update` command
   - Allow a path to be passed instead of a package name and version
-  - Accept an owner arg to search against users and orgs
-  - Change the repos positional arg to be optional
+  - ~~Accept an owner arg to search against users and orgs~~
+  - ~~Change the repos positional arg to be optional~~
   - Accept tags in the way that `npm install` does
   - Handle yarn
-  - Handle `.nvmrc`
   - Accept `--no-lockfile` option
   - Accept `--no-pr` option
 - GitLab adapter
 - Bitbucket adapter
+- Allow configuring the remote URL base for an adapter
+- Handle API rate limits

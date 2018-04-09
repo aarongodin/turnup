@@ -3,6 +3,24 @@ const actions = require('./actions')
 const adapters = require('./adapters')
 const { fatal, errorTypes } = require('./errors')
 
+const checkUpdateArgs = argv => {
+  const ownerRegex = /^[a-zA-Z\d-_]{2,}$/
+  const repoRegex = /^[a-zA-Z\d-_]{2,}\/[a-zA-Z\d-_]{2,}$/
+  const notPresent = argv.repos === undefined && argv.owners === undefined
+
+  if (notPresent) {
+    fatal('turnup.preCommand', new errorTypes.RepositoriesNotProvidedError())
+  }
+
+  if (argv.repos && !argv.repos.every(r => repoRegex.test(r))) {
+    fatal('turn.preCommand', new errorTypes.InvalidTargetRepositoriesOptionError())
+  }
+
+  if (argv.owner && !ownerRegex.test(argv.owner)) {
+    fatal('turn.preCommand', new errorTypes.InvalidTargetRepositoriesOptionError())
+  }
+}
+
 const processAdapter = async (providedAdapterString) => {
   let adapterString = providedAdapterString
 
@@ -33,9 +51,13 @@ const processAdapter = async (providedAdapterString) => {
   return await factory.createFromCli()
 }
 
+require('yargonaut')
+  .style('blue.underline')
+  .errorsStyle('red.bold')
+
 require('yargs')
   .command(
-    'update <package> <repos>',
+    'update <package>',
     'update a package dependency in many repos',
     yargs => {
       yargs.positional('package', {
@@ -43,24 +65,38 @@ require('yargs')
         type: 'string'
       })
 
-      yargs.positional('repos', {
-        describe: 'users|orgs|repos to search against (comma-list)',
+      yargs.option('r', {
+        alias: 'repos',
+        describe: 'repos to search against',
         type: 'string'
-      })
+      }).array('repos')
 
-      yargs.positional('users', {
-        describe: 'users to search against (comma-list)',
+      yargs.option('o', {
+        alias: 'owner',
+        describe: 'owner to search against',
         type: 'string'
       })
 
       yargs.option('a', {
         alias: 'adapter',
-        describe: ''
+        describe: 'specify an adapter',
+        choices: adapters.types
       })
     },
     async argv => {
+      checkUpdateArgs(argv)
       const adapter = await processAdapter(argv.adapter)
-      actions.update(argv.package, argv.repos, adapter)
+      const options = {}
+
+      if (argv.repos) {
+        options.repos = argv.repos
+      }
+
+      if (argv.owner) {
+        options.owner = argv.owner
+      }
+
+      actions.update(argv.package, adapter, options)
     }
   )
   .command(

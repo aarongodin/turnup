@@ -1,7 +1,7 @@
 const Immutable = require('immutable')
 const inquirer = require('inquirer')
+const chalk = require('chalk')
 const formatPackage = require('format-package')
-const c = require('colors/safe')
 const async = require('async')
 const packages = require('../packages')
 const { errorTypes, fatal } = require('../errors')
@@ -9,10 +9,6 @@ const { notify } = require('../logging')
 const { promisify } = require('util')
 
 const ACTION = 'turnup.update'
-
-const parseRepos = repos => {
-  return repos.split(',')
-}
 
 const promptUserForRepos = repos => inquirer.prompt([{
   type: 'checkbox',
@@ -23,7 +19,7 @@ const promptUserForRepos = repos => inquirer.prompt([{
 }])
 
 const updateRepository = async (adapter, repository, packageName, packageVersion) => {
-  notify(ACTION, `Updating ${c.italic(repository.fullName)}`)
+  notify(ACTION, `Updating ${chalk.italic(repository.fullName)}`)
   const branchName = `turnup/${packageName}@${packageVersion}`
   const packageDef = repository.packageDefinition.decoded
 
@@ -48,18 +44,34 @@ const updateRepository = async (adapter, repository, packageName, packageVersion
   await adapter.createPullRequest(repository, branchName)
 }
 
-module.exports = async (packageString, repos, adapter) => {
+module.exports = async (packageString, adapter, options = {}) => {
   notify(ACTION, `Using adapter ${adapter.getName()}.`)
-  try {
-    const parsedPackage = packages.parse.parsePackage(packageString)
-    const parsedRepos = parseRepos(repos)
 
-    let repositories = await adapter.fetchRepositories(parsedRepos)
+  try {
+    const { repos = [], owner } = options
+    const parsedPackage = packages.parse.parsePackage(packageString)
+
+    let repositories = Immutable.List()
+
+    if (repos.length > 0) {
+      repositories = repositories.concat(await adapter.fetchRepositories(repos))
+    }
+
+    if (typeof owner === 'string' && owner.length > 0) {
+      repositories = repositories.concat(await adapter.fetchRepositoriesByOwner(owner))
+    }
+
+    repositories = repositories.reduce((reduction, value) => {
+      if (!reduction.find(repo => repo.fullName === value.fullName)) {
+        return reduction.push(value)
+      }
+      return reduction
+    }, Immutable.List())
 
     if (repositories.size === 0) {
       fatal(ACTION, new errorTypes.NoRepositoriesFoundError())
     } else {
-      notify(ACTION, `Found ${c.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'}.`)
+      notify(ACTION, `Found ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'}.`)
     }
 
     repositories = await adapter.fetchPackageDefinitions(repositories)
@@ -68,7 +80,7 @@ module.exports = async (packageString, repos, adapter) => {
     if (repositories.size === 0) {
       notify(ACTION, 'No repositories require updating.')
     } else {
-      notify(ACTION, `Found ${c.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} out of date.`)
+      notify(ACTION, `Found ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} out of date.`)
     }
 
     const repoChoices = repositories.map(repo => {
@@ -85,7 +97,7 @@ module.exports = async (packageString, repos, adapter) => {
       notify(ACTION, 'No selected repos.')
       return
     } else {
-      notify(ACTION, `Updating ${c.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} with ${c.bold(packageString)}`)
+      notify(ACTION, `Updating ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} with ${chalk.bold(packageString)}`)
     }
 
     await promisify(async.series).call(this, repositories.map(repository => updateRepository.bind(this, adapter, repository, parsedPackage.name, parsedPackage.version)).toJS())

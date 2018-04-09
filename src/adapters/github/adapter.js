@@ -30,14 +30,32 @@ class GitHub {
     return Immutable.List(repositories.map(createRepositoryEntity))
   }
 
-  fetchRepository(name) {
+  async fetchRepository(name) {
     return this.api.getRepo(name)
+  }
+
+  async fetchRepositoriesByOwner(owner) {
+    let ownerRepos = await this.api.getUserRepos(owner)
+
+    if (!Array.isArray(ownerRepos) || ownerRepos.length === 0) {
+      ownerRepos = await this.api.getOrgRepos(owner)
+    }
+
+    return Immutable.List(ownerRepos.map(createRepositoryEntity))
   }
 
   async fetchPackageDefinitions(repositories) {
     const list = await Promise.all(repositories.map(async repository => {
-      const packageDefinition = await this.getPackageJson(repository)
-      return repository.set('packageDefinition', packageDefinition)
+      try {
+        const packageDefinition = await this.getPackageJson(repository)
+        return repository.set('packageDefinition', packageDefinition)
+      } catch (err) {
+        if (err.statusCode === 404) {
+          return repository
+        } else {
+          throw err
+        }
+      }
     }))
 
     return Immutable.List(list)
@@ -58,7 +76,6 @@ class GitHub {
     const defaultBranchSha = defaultBranchRef.object.sha
     return await this.api.createRef(repository.fullName, branchName, defaultBranchSha)
   }
-  // async createContents(repoFullName, branchName, path, currentSha, contents, message) {
 
   async commitPackageDefinition(repository, branchName, packageDefinition, lockFile) {
     const rel = repository.dependencyRelationship
