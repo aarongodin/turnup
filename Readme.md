@@ -1,5 +1,7 @@
 # turnup
 
+[![Build Status](https://travis-ci.org/aarongodin/turnup.svg?branch=master)](https://travis-ci.org/aarongodin/turnup)
+
 Manage NPM dependencies across repositories, users, projects, teams, and orgs.
 
 ## Installation
