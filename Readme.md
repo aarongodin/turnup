@@ -85,20 +85,19 @@ We welcome all contributors. Before making changes, be sure to review the [Issue
 
 Aaron Godin - [aarongodin](https://github.com/aarongodin)
 
-## Todo
+## Todo for base functionality 
 
-This is just for my own sake right now while I build out turnup's first minor version.
-
-- 100% test coverage
-- `update` command
-  - ~~Allow a path to be passed instead of a package name and version~~
-  - ~~Accept an owner arg to search against users and orgs~~
-  - ~~Change the repos positional arg to be optional~~
-  - ~~Accept tags in the way that `npm install` does~~
-  - Handle yarn
-  - ~~Accept `--no-lockfile` option~~
-  - ~~Accept `--no-pr` option~~
+- Yarn support
+- Test coverage
 - GitLab adapter
 - Bitbucket adapter
 - Allow configuring the remote URL base for an adapter
+- Allow specifying an npm registry to reference other than the public (required for npm tags such as `jest@latest`)
 - Handle API rate limits
+
+## Future Enhancements?
+
+- Give additional feedback on major version jumps, or allow an option to dictate whether major jumps are allowed
+- Options to override any prompted values, so that you could run this in CI
+- `inspect` command to list cummulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
+- Report to JSON so that output is machine readable
