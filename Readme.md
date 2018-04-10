@@ -101,3 +101,4 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 - Options to override any prompted values, so that you could run this in CI
 - `inspect` command to list cummulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
 - Report to JSON so that output is machine readable
+- Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy.
