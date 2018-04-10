@@ -51,29 +51,34 @@ const updateRepository = async (adapter, repository, packageName, packageVersion
   }
 }
 
+const fetchRepositories = async (adapter, options) => {
+  const { repos = [], owner } = options
+  let repositories = Immutable.List()
+
+  if (repos.length > 0) {
+    repositories = repositories.concat(await adapter.fetchRepositories(repos))
+  }
+
+  if (typeof owner === 'string' && owner.length > 0) {
+    repositories = repositories.concat(await adapter.fetchRepositoriesByOwner(owner))
+  }
+
+  return repositories.reduce((reduction, value) => {
+    if (!reduction.find(repo => repo.fullName === value.fullName)) {
+      return reduction.push(value)
+    }
+    return reduction
+  }, Immutable.List())
+}
+
+
 module.exports = async (packageString, adapter, options = {}) => {
   notify(ACTION, `Using adapter ${adapter.getName()}.`)
 
   try {
-    const { repos = [], owner } = options
-    const parsedPackage = packages.parse.parsePackage(packageString)
-
-    let repositories = Immutable.List()
-
-    if (repos.length > 0) {
-      repositories = repositories.concat(await adapter.fetchRepositories(repos))
-    }
-
-    if (typeof owner === 'string' && owner.length > 0) {
-      repositories = repositories.concat(await adapter.fetchRepositoriesByOwner(owner))
-    }
-
-    repositories = repositories.reduce((reduction, value) => {
-      if (!reduction.find(repo => repo.fullName === value.fullName)) {
-        return reduction.push(value)
-      }
-      return reduction
-    }, Immutable.List())
+    const parsedPackage = await packages.parse.parsePackage(packageString)
+    const parsedPackageString = `${parsedPackage.name}@${parsedPackage.version}`
+    let repositories = await fetchRepositories(adapter, options)
 
     if (repositories.size === 0) {
       fatal(ACTION, new errorTypes.NoRepositoriesFoundError())
@@ -85,7 +90,7 @@ module.exports = async (packageString, adapter, options = {}) => {
     repositories = packages.filter.repositoriesByDependencyUpgrade(repositories, parsedPackage.name, parsedPackage.version)
 
     if (repositories.size === 0) {
-      notify(ACTION, 'No repositories require updating.')
+      notify(ACTION, 'No repositories require updating.', true)
     } else {
       notify(ACTION, `Found ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} out of date.`)
     }
@@ -104,7 +109,7 @@ module.exports = async (packageString, adapter, options = {}) => {
       notify(ACTION, 'No selected repos.')
       return
     } else {
-      notify(ACTION, `Updating ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} with ${chalk.bold(packageString)}`)
+      notify(ACTION, `Updating ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} with ${chalk.bold(parsedPackageString)}`)
     }
 
     await promisify(async.series).call(this, repositories.map(repository => updateRepository.bind(this, adapter, repository, parsedPackage.name, parsedPackage.version, options)).toJS())

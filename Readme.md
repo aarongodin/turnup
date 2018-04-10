@@ -91,10 +91,10 @@ This is just for my own sake right now while I build out turnup's first minor ve
 
 - 100% test coverage
 - `update` command
-  - Allow a path to be passed instead of a package name and version
+  - ~~Allow a path to be passed instead of a package name and version~~
   - ~~Accept an owner arg to search against users and orgs~~
   - ~~Change the repos positional arg to be optional~~
-  - Accept tags in the way that `npm install` does
+  - ~~Accept tags in the way that `npm install` does~~
   - Handle yarn
   - ~~Accept `--no-lockfile` option~~
   - ~~Accept `--no-pr` option~~

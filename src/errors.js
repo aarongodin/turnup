@@ -3,7 +3,14 @@ const chalk = require('chalk')
 class InvalidPackageVersionError extends Error {
   constructor(...args) {
     super(...args)
-    this.message = 'Invalid or unspecified package version. Package names must use the `npm install` syntax for defining versions (ex: jest@20.0.0).'
+    this.message = 'Invalid or unspecified package version/tag. Package names must use the `npm install` syntax for defining versions (ex: jest@20.0.0 or jest@next).'
+  }
+}
+
+class LocalPackageParseError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.message = 'Unable to parse the provided local package.json. Be sure to pass a path to a valid package.json file or a directory containing one.'
   }
 }
 
@@ -58,6 +65,7 @@ class InvalidTargetOwnerOptionError extends Error {
 
 const errorTypes = {
   InvalidPackageVersionError,
+  LocalPackageParseError,
   NoRepositoriesFoundError,
   AdapterNotConfiguredError,
   AdapterNotProvidedError,
