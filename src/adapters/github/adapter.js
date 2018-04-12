@@ -1,5 +1,6 @@
 const Immutable = require('immutable')
 const RepositoryEntity = require('../../domain/repository-entity')
+const LockfileEntity = require('../../domain/lockfile-entity')
 const Api = require('./api')
 const async = require('async')
 const { promisify } = require('util')
@@ -61,6 +62,40 @@ class GitHub {
     return Immutable.List(list)
   }
 
+  async fetchLockfileDefinition(repository) {
+    try {
+      const yarnLock = await this.api.getContents(repository.fullName, 'yarn.lock')
+      const decoded = Buffer.from(yarnLock.content, 'base64').toString()
+
+      return new LockfileEntity({
+        sha: yarnLock.sha,
+        fileContents: decoded,
+        fileName: 'yarn.lock',
+        packageManager: 'yarn'
+      })
+    } catch (err) {
+      if (err.statusCode !== 404) {
+        throw err
+      }
+    }
+
+    try {
+      const packageLock = await this.api.getContents(repository.fullName, 'package-lock.json')
+      const decoded = Buffer.from(packageLock.content, 'base64').toString()
+
+      return new LockfileEntity({
+        sha: packageLock.sha,
+        fileContents: decoded,
+        fileName: 'package-lock.json',
+        packageManager: 'npm'
+      })
+    } catch (err) {
+      if (err.statusCode !== 404) {
+        throw err
+      }
+    }
+  }
+
   async getPackageJson(repository) {
     const contents = await this.api.getContents(repository.fullName, 'package.json')
     const decoded = Buffer.from(contents.content, 'base64').toString()
@@ -90,24 +125,17 @@ class GitHub {
       `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - package.json`
     )]
 
-    if (lockFile !== undefined) {
-      try {
-        const lockFileRemote = await this.api.getContents(repository.fullName, 'package-lock.json')
-        queued.push(this.api.createContents.bind(
-          this.api,
-          repository.fullName,
-          branchName,
-          'package-lock.json',
-          lockFileRemote.sha,
-          lockFile,
-          `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - package-lock.json`
-        ))
-      } catch (err) {
-        console.error(err)
-        if (err.statusCode !== 404) {
-          throw err
-        }
-      }
+    if (lockFile && repository.lockfileEntity) {
+      let entity = repository.lockfileEntity
+      queued.push(this.api.createContents.bind(
+        this.api,
+        repository.fullName,
+        branchName,
+        entity.fileName,
+        entity.sha,
+        lockFile.fileContents,
+        `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - ${entity.fileName}`
+      ))
     }
 
     return await promisify(async.series).call(this, queued)

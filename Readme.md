@@ -85,7 +85,7 @@ We welcome all contributors. Before making changes, be sure to review the [Issue
 
 Aaron Godin - [aarongodin](https://github.com/aarongodin)
 
-## Todo for base functionality 
+## Todo for base functionality
 
 - Yarn support
 - Test coverage

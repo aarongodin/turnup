@@ -84,7 +84,7 @@ const fatal = (action, err) => {
   process.exit(1)
 }
 
-module.exports =  {
+module.exports = {
   errorTypes,
   fatal
 }

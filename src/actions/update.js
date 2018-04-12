@@ -18,7 +18,8 @@ const promptUserForRepos = repos => inquirer.prompt([{
   pageSize: 20
 }])
 
-const updateRepository = async (adapter, repository, packageName, packageVersion, options = {}) => {
+const updateRepository = async (adapter, repo, packageName, packageVersion, options = {}) => {
+  let repository = repo
   notify(ACTION, `Updating ${chalk.italic(repository.fullName)}`)
 
   const branchName = `turnup/${packageName}@${packageVersion}`
@@ -32,18 +33,23 @@ const updateRepository = async (adapter, repository, packageName, packageVersion
 
   const formattedPackageDef = await formatPackage(packageDef)
 
-  let lockFile
+  let updatedLockFile
 
   if (!options.noLockfile) {
     notify(ACTION, 'Generating lockfile.')
-    lockFile = await packages.lockfile.create(formattedPackageDef)
+    const currentLockFile = await adapter.fetchLockfileDefinition(repository)
+
+    if (currentLockFile !== undefined) {
+      repository = repository.set('lockfileEntity', currentLockFile)
+      updatedLockFile = await packages.lockfile.create(formattedPackageDef, currentLockFile.packageManager)
+    }
   }
 
   notify(ACTION, 'Creating branch.')
   await adapter.createBranch(repository, branchName)
 
   notify(ACTION, 'Creating commit.')
-  await adapter.commitPackageDefinition(repository, branchName, formattedPackageDef, lockFile)
+  await adapter.commitPackageDefinition(repository, branchName, formattedPackageDef, updatedLockFile)
 
   if (!options.noPullRequest) {
     notify(ACTION, 'Creating pull request.')
@@ -70,7 +76,6 @@ const fetchRepositories = async (adapter, options) => {
     return reduction
   }, Immutable.List())
 }
-
 
 module.exports = async (packageString, adapter, options = {}) => {
   notify(ACTION, `Using adapter ${adapter.getName()}.`)
