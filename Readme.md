@@ -87,13 +87,12 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 
 ## Todo for base functionality
 
-- Yarn support
-- Test coverage
 - GitLab adapter
 - Bitbucket adapter
 - Allow configuring the remote URL base for an adapter
 - Allow specifying an npm registry to reference other than the public (required for npm tags such as `jest@latest`)
 - Handle API rate limits
+- Test coverage
 
 ## Future Enhancements?
 
