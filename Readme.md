@@ -71,7 +71,7 @@ A required option is any option that specifies target repositories.
 
 ### Lockfiles
 
-Generating lockfiles (`package-lock.json`, `yarn.lock`) is the default functionality of the `update` command but can be turned off through the `--no-lockfile` option. Lockfiles are also only generated if it already exists in the repository.
+Generating lockfiles (`package-lock.json`, `yarn.lock`) is the default functionality of the `update` command but can be turned off through the `--no-lockfile` option. Lockfiles are also only generated if it already exists in the repository. You can force generating and committing a lockfile by passing the `--force-lockfile` option with a value of `npm` or `yarn`.
 
 ### Yarn
 
@@ -87,7 +87,7 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 
 ## Todo for base functionality
 
-- GitLab adapter
+- `--force-lockfile` option
 - Bitbucket adapter
 - Allow configuring the remote URL base for an adapter
 - Allow specifying an npm registry to reference other than the public (required for npm tags such as `jest@latest`)
@@ -100,4 +100,4 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 - Options to override any prompted values, so that you could run this in CI
 - `inspect` command to list cummulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
 - Report to JSON so that output is machine readable
-- Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy.
+- Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy. This might not be possible with private repos.

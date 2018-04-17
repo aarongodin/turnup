@@ -2,28 +2,26 @@ const Immutable = require('immutable')
 const RepositoryEntity = require('../../domain/repository-entity')
 const LockfileEntity = require('../../domain/lockfile-entity')
 const Api = require('./api')
-const { series: asyncSeries } = require('async')
-const { promisify } = require('util')
 
 const createRepositoryEntity = raw => {
   return new RepositoryEntity({
-    name: raw.name,
-    fullName: raw.full_name,
+    name: raw.path,
+    fullName: raw.path_with_namespace,
     defaultBranch: raw.default_branch
   })
 }
 
-class GitHubAdapter {
+class GitLabAdapter {
   constructor(accessToken) {
     this.api = new Api(accessToken)
   }
 
   getName() {
-    return 'GitHub'
+    return 'GitLab'
   }
 
   getKey() {
-    return 'github'
+    return 'gitlab'
   }
 
   async fetchRepositories(names) {
@@ -32,14 +30,14 @@ class GitHubAdapter {
   }
 
   async fetchRepository(name) {
-    return this.api.getRepo(name)
+    return this.api.getProject(name)
   }
 
   async fetchRepositoriesByOwner(owner) {
-    let ownerRepos = await this.api.getUserRepos(owner)
+    let ownerRepos = await this.api.getUserProjects(owner)
 
     if (!Array.isArray(ownerRepos) || ownerRepos.length === 0) {
-      ownerRepos = await this.api.getOrgRepos(owner)
+      ownerRepos = await this.api.getGroupProjects(owner)
     }
 
     return Immutable.List(ownerRepos.map(createRepositoryEntity))
@@ -62,13 +60,23 @@ class GitHubAdapter {
     return Immutable.List(list)
   }
 
+  async getPackageJson(repository) {
+    const projectFile = await this.api.getProjectFile(repository.fullName, 'package.json', repository.defaultBranch)
+    const decoded = Buffer.from(projectFile.content, 'base64').toString()
+
+    return {
+      decoded: JSON.parse(decoded),
+      sha: projectFile.commit_id
+    }
+  }
+
   async fetchLockfileDefinition(repository) {
     try {
-      const yarnLock = await this.api.getContents(repository.fullName, 'yarn.lock')
+      const yarnLock = await this.api.getProjectFile(repository.fullName, 'yarn.lock', repository.defaultBranch)
       const decoded = Buffer.from(yarnLock.content, 'base64').toString()
 
       return new LockfileEntity({
-        sha: yarnLock.sha,
+        sha: yarnLock.commit_id,
         fileContents: decoded,
         fileName: 'yarn.lock',
         packageManager: 'yarn'
@@ -80,11 +88,11 @@ class GitHubAdapter {
     }
 
     try {
-      const packageLock = await this.api.getContents(repository.fullName, 'package-lock.json')
+      const packageLock = await this.api.getProjectFile(repository.fullName, 'package-lock.json', repository.defaultBranch)
       const decoded = Buffer.from(packageLock.content, 'base64').toString()
 
       return new LockfileEntity({
-        sha: packageLock.sha,
+        sha: packageLock.commit_id,
         fileContents: decoded,
         fileName: 'package-lock.json',
         packageManager: 'npm'
@@ -96,49 +104,34 @@ class GitHubAdapter {
     }
   }
 
-  async getPackageJson(repository) {
-    const contents = await this.api.getContents(repository.fullName, 'package.json')
-    const decoded = Buffer.from(contents.content, 'base64').toString()
-
-    return {
-      decoded: JSON.parse(decoded),
-      sha: contents.sha
-    }
-  }
-
-  async createBranch(repository, branchName) {
-    const defaultBranchRef = await this.api.getRef(repository.fullName, repository.defaultBranch)
-    const defaultBranchSha = defaultBranchRef.object.sha
-    return await this.api.createRef(repository.fullName, branchName, defaultBranchSha)
+  createBranch(repository, branchName) {
+    return this.api.createBranch(repository.fullName, branchName, repository.defaultBranch)
   }
 
   async commitPackageDefinition(repository, branchName, packageDefinition, lockFile) {
     const rel = repository.dependencyRelationship
 
-    const queued = [this.api.createContents.bind(
-      this.api,
-      repository.fullName,
-      branchName,
-      'package.json',
-      repository.packageDefinition.sha,
-      packageDefinition,
-      `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - package.json`
-    )]
+    const actions = [{
+      action: 'update',
+      file_path: 'package.json',
+      content: Buffer.from(packageDefinition).toString('base64'),
+      encoding: 'base64'
+    }]
 
     if (lockFile && repository.lockfileEntity) {
       let entity = repository.lockfileEntity
-      queued.push(this.api.createContents.bind(
-        this.api,
-        repository.fullName,
-        branchName,
-        entity.fileName,
-        entity.sha,
-        lockFile.fileContents,
-        `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - ${entity.fileName}`
-      ))
+      actions.push({
+        action: 'update',
+        file_path: entity.fileName,
+        content: Buffer.from(lockFile.fileContents).toString('base64'),
+        encoding: 'base64'
+      })
     }
 
-    return await promisify(asyncSeries).call(this, queued)
+    const filePaths = actions.map(action => action.file_path).join(', ')
+    const commitMessage = `[turnup] Auto update of ${rel.type} dependency ${rel.packageName}@${rel.packageVersion} - ${filePaths}`
+
+    return this.api.createCommit(repository.fullName, branchName, commitMessage, actions)
   }
 
   async createPullRequest(repository, branchName) {
@@ -150,8 +143,8 @@ Update the package.json dependency for \`${depString}\`. This PR was automatical
 
 **Note**: formatting may have changed for package.json. It is processed using [format-package](https://www.npmjs.com/package/format-package).
 `).trim()
-    return await this.api.createPull(repository.fullName, repository.defaultBranch, branchName, title, body)
+    return await this.api.createMergeRequest(repository.fullName, repository.defaultBranch, branchName, title, body)
   }
 }
 
-module.exports = GitHubAdapter
+module.exports = GitLabAdapter
