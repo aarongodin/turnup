@@ -99,3 +99,4 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 - Report to JSON so that output is machine readable
 - Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy. This might not be possible with private repos.
 - Allow specifying version ranges
+- GH Pages
