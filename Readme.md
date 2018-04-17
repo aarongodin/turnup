@@ -33,7 +33,7 @@ The `update` command asks which repositories to update and generates new lock fi
 
 ## Adapters
 
-Adapters are the method by which turnup interacts with SCM hosts. Turnup supports **GitHub**, **GitLab**, and **Bitbucket**. If there is a host you would like to use turnup with, consider contributing!
+Adapters are the method by which turnup interacts with SCM hosts. Turnup supports **GitHub**, **GitLab**, and **Bitbucket**.
 
 ## Guide
 
@@ -93,11 +93,9 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 - Allow specifying an npm registry to reference other than the public (required for npm tags such as `jest@latest`)
 - Handle API rate limits
 - Test coverage
-
-## Future Enhancements?
-
 - Give additional feedback on major version jumps, or allow an option to dictate whether major jumps are allowed
 - Options to override any prompted values, so that you could run this in CI
 - `inspect` command to list cummulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
 - Report to JSON so that output is machine readable
 - Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy. This might not be possible with private repos.
+- Allow specifying version ranges
