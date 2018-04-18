@@ -17,7 +17,7 @@ It's recommended to install turnup globally as it stores runtime configuration i
 
 ## Introduction
 
-For teams and individuals that rely heavily on NPM modules, it gets cumbersome to move changes upstream. When you update one package, a lot of menial work is done to update packages that depend on it, branch and commit, and finally review those changes. Although a monorepo structure avoids this difficulty entirely, not all scenarios allow for it (especially in orgs where teams have poorly-defined functional dependencies on each other -- see [Conway's Law](https://en.wikipedia.org/wiki/Conway%27s_law))
+For teams and individuals that rely heavily on NPM modules, it gets cumbersome to move changes upstream. When you update one package, a lot of menial work is done to update packages that depend on it, branch and commit, and finally review those changes. Although a monorepo structure avoids this difficulty entirely, not all scenarios allow for it (especially in orgs where teams have loosely-defined functional dependencies on each other -- see [Conway's Law](https://en.wikipedia.org/wiki/Conway%27s_law))
 
 ### Example Use Case
 

@@ -7,3 +7,4 @@ describe('index', () => {
     expect(Index.configure).toBeDefined()
   })
 })
+

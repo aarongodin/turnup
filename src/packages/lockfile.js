@@ -29,7 +29,8 @@ const create = async (packageDefinition, packageManager) => {
   const tempdir = tmp.dirSync({ unsafeCleanup: true })
   await writeFileAsync(`${tempdir.name}/package.json`, packageDefinition)
 
-  let lockFile, fileName
+  let lockFile
+  let fileName
 
   if (packageManager === 'yarn') {
     lockFile = await createWithYarn(tempdir.name)
