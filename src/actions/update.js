@@ -100,15 +100,17 @@ module.exports = async (packageString, adapter, options = {}) => {
       notify(ACTION, `Found ${chalk.bold(repositories.size)} repositor${repositories.size === 1 ? 'y' : 'ies'} out of date.`)
     }
 
-    const repoChoices = repositories.map(repo => {
-      return {
-        name: `${repo.packageDefinition.decoded.name} (${repo.dependencyRelationship.type} dependency of ${repo.dependencyRelationship.currentVersion})`,
-        value: repo
-      }
-    }).toJS()
+    if (!options.continue) {
+      const repoChoices = repositories.map(repo => {
+        return {
+          name: `${repo.packageDefinition.decoded.name} (${repo.dependencyRelationship.type} dependency of ${repo.dependencyRelationship.currentVersion})`,
+          value: repo
+        }
+      }).toJS()
 
-    const answers = await promptUserForRepos(repoChoices)
-    repositories = Immutable.List(answers.repos)
+      const answers = await promptUserForRepos(repoChoices)
+      repositories = Immutable.List(answers.repos)
+    }
 
     if (repositories.size === 0) {
       notify(ACTION, 'No selected repos.')

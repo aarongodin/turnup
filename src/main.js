@@ -83,13 +83,24 @@ require('yargs')
         choices: adapters.types
       })
 
+      yargs.option('c', {
+        alias: 'continue',
+        describe: 'do not prompt (run this in CI)',
+        type: 'boolean'
+      })
+
       yargs.option('no-pr', {
-        describe: 'do not create a pull request',
+        describe: 'do not create a pull request / merge request',
         type: 'boolean'
       })
 
       yargs.option('no-lockfile', {
         describe: 'do not update the lockfile',
+        type: 'boolean'
+      })
+
+      yargs.option('force-lockfile', {
+        describe: 'always generate & commit a lockfile',
         type: 'boolean'
       })
     },
@@ -112,6 +123,14 @@ require('yargs')
 
       if (argv['no-lockfile']) {
         options.noLockfile = true
+      }
+
+      if (argv['force-lockfile']) {
+        options.forceLockfile = true
+      }
+
+      if (argv['continue']) {
+        options.continue = true
       }
 
       actions.update(argv.package, adapter, options)
