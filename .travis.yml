@@ -1,5 +1,6 @@
 langauge: node_js
-nvm:
+dist: "precise"
+node_js:
   - "7.6"
   - "8"
   - "9"
