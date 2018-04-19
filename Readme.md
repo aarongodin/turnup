@@ -7,6 +7,8 @@ Manage NPM dependencies across repositories, users, projects, teams, and orgs.
 
 ## Installation
 
+**Requires Node 7.6 or higher**
+
 It's recommended to install turnup globally as it stores runtime configuration in your home directory.
 
 ```sh
