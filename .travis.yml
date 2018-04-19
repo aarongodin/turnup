@@ -1,5 +1,5 @@
 langauge: node_js
-node_js:
+nvm:
   - "7.6"
   - "8"
   - "9"
