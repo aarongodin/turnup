@@ -23,8 +23,6 @@ For teams and individuals that rely heavily on NPM modules, it gets cumbersome t
 
 ### Example Use Case
 
-It might be beneficial to think of turnup as the inverse of [lerna](https://npmjs.com/lerna).
-
 Let's say you host your team's source code in a GitHub org, and you have 25 repositories that all rely on various versions of Jest. You can ask turnup to update Jest across every repo using:
 
 ```sh
