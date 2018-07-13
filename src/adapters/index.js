@@ -1,9 +1,11 @@
 const GitHub = require('./github')
 const GitLab = require('./gitlab')
+const BitBucket =  require('./bitbucket')
 
 const adapters = new Map([
   ['github', GitHub],
-  ['gitlab', GitLab]
+  ['gitlab', GitLab],
+  ['bitbucket', BitBucket]
 ])
 
 const getAdapter = adapterString => {

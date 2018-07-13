@@ -86,13 +86,12 @@ Aaron Godin - [aarongodin](https://github.com/aarongodin)
 ## Todo for base functionality
 
 - `--force-lockfile` option
-- Bitbucket adapter
 - Allow configuring the remote URL base for an adapter
 - Allow specifying an npm registry to reference other than the public (required for npm tags such as `jest@latest`)
 - Handle API rate limits
 - Test coverage
 - Give additional feedback on major version jumps, or allow an option to dictate whether major jumps are allowed
-- `inspect` command to list cummulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
+- `inspect` command to list cumulative (or specific package) dependencies across a set of repos (would be useful for understanding how many versions of a library you depend on and where)
 - Report to JSON so that output is machine readable
 - Use `nodegit` to look at files. Would reduce API usage if it gets a little too crazy. This might not be possible with private repos.
 - Allow specifying version ranges

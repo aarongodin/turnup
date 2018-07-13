@@ -22,10 +22,13 @@ const generate = async (cwd, command, filename) => {
   return lockFile.toString()
 }
 
-const createWithNpm = cwd => generate(cwd, 'npm install --package-lock-only', 'package-lock.json')
+const createWithNpm = (cwd, registry) => {
+  const registryArg = registry ? ` --registry ${registry}` : ''
+  return generate(cwd, `npm install${registryArg} --package-lock-only`, 'package-lock.json')
+}
 const createWithYarn = cwd => generate(cwd, 'yarn install', 'yarn.lock')
 
-const create = async (packageDefinition, packageManager) => {
+const create = async (packageDefinition, packageManager, registry) => {
   const tempdir = tmp.dirSync({ unsafeCleanup: true })
   await writeFileAsync(`${tempdir.name}/package.json`, packageDefinition)
 
@@ -36,7 +39,7 @@ const create = async (packageDefinition, packageManager) => {
     lockFile = await createWithYarn(tempdir.name)
     fileName = 'yarn.lock'
   } else if (packageManager === 'npm') {
-    lockFile = await createWithNpm(tempdir.name)
+    lockFile = await createWithNpm(tempdir.name, registry)
     fileName = 'package-lock.json'
   }
 

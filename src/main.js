@@ -103,35 +103,30 @@ require('yargs')
         describe: 'always generate & commit a lockfile',
         type: 'boolean'
       })
+
+      yargs.option('registry', {
+        describe: 'point to another NPM registry for the npm install, does not apply to yarn',
+        type: 'string'
+      })
     },
     async argv => {
       checkUpdateArgs(argv)
       const adapter = await processAdapter(argv.adapter)
-      const options = {}
-
-      if (argv.repos) {
-        options.repos = argv.repos
+      const argKeyMap = {
+        repos: 'repos',
+        owner: 'owner',
+        'no-pr': 'noPullRequest',
+        'no-lockfile': 'noLockfile',
+        'force-lockfile': 'forceLockFile',
+        continue: 'continue',
+        registry: 'registry'
       }
 
-      if (argv.owner) {
-        options.owner = argv.owner
-      }
+      const options =  Object.keys(argKeyMap).reduce((accumulator, key) => {
+        accumulator[argKeyMap[key]] = argv[key]
 
-      if (argv['no-pr']) {
-        options.noPullRequest = true
-      }
-
-      if (argv['no-lockfile']) {
-        options.noLockfile = true
-      }
-
-      if (argv['force-lockfile']) {
-        options.forceLockfile = true
-      }
-
-      if (argv['continue']) {
-        options.continue = true
-      }
+        return accumulator
+      }, {})
 
       actions.update(argv.package, adapter, options)
     }
