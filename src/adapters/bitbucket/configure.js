@@ -9,18 +9,18 @@ const ACTION = 'turnup.adapter.configure'
 const DEFAULT_BASE_URL = 'https://api.bitbucket.org/2.0'
 
 const configure = async () => {
-  notify(ACTION, 'Configuring BitBucket.')
+  notify(ACTION, 'Configuring Bitbucket.')
 
   const answers = await inquirer.prompt([
     {
       type: 'input',
       name: 'token',
-      message: 'Enter a personal access token created from your BitBucket account:'
+      message: 'Enter a personal access token created from your Bitbucket account:'
     },
     {
       type: 'input',
       name: 'baseUrl',
-      message: `Enter the BitBucket API URL or press enter for default (${DEFAULT_BASE_URL}):`
+      message: `Enter the Bitbucket API URL or press enter for default (${DEFAULT_BASE_URL}):`
     }
   ])
 
@@ -49,7 +49,7 @@ const configure = async () => {
   _set(c, 'adapters.credentials.bitbucket.baseUrl', parsedUrl.toString())
   await globalConfig.save(c)
 
-  notify(ACTION, 'The BitBucket adapter was configured.')
+  notify(ACTION, 'The Bitbucket adapter was configured.')
 }
 
 module.exports = configure

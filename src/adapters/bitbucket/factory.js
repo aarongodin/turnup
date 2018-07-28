@@ -1,4 +1,4 @@
-const BitBucket = require('./adapter')
+const Bitbucket = require('./adapter')
 const globalConfig = require('../../config/global')
 const _get = require('lodash.get')
 
@@ -15,7 +15,7 @@ class Factory {
 
   async createFromCli() {
     const config = await this.getConfig()
-    return new BitBucket(config)
+    return new Bitbucket(config)
   }
 }
 

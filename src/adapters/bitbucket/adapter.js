@@ -14,13 +14,13 @@ const createRepositoryEntity = raw => {
   })
 }
 
-class BitBucketAdapter {
+class BitbucketAdapter {
   constructor(config) {
     this.api = new Api(config)
   }
 
   getName() {
-    return 'BitBucket'
+    return 'Bitbucket'
   }
 
   getKey() {
@@ -142,4 +142,4 @@ Update the package.json dependency for \`${depString}\`. This PR was automatical
   }
 }
 
-module.exports = BitBucketAdapter
+module.exports = BitbucketAdapter

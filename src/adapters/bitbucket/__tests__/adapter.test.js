@@ -1,8 +1,8 @@
-const BitBucketAdapter = require('../adapter')
+const BitbucketAdapter = require('../adapter')
 
-describe('BitBucketAdapter', () => {
+describe('BitbucketAdapter', () => {
   it('should pass', () => {
-    expect(BitBucketAdapter).toBeDefined()
+    expect(BitbucketAdapter).toBeDefined()
   })
 })
 

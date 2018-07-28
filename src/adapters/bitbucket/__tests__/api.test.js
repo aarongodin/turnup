@@ -1,6 +1,6 @@
 const Api = require('../api')
 
-describe('BitBucket API', () => {
+describe('Bitbucket API', () => {
   it('should pass', () => {
     expect(Api).toBeDefined()
   })

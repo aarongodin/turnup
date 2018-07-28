@@ -1,6 +1,6 @@
 const Factory = require('../factory')
 
-describe('BitBucket Configure', () => {
+describe('Bitbucket Configure', () => {
   it('should pass', () => {
     expect(Factory).toBeDefined()
   })
