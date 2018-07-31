@@ -19,7 +19,7 @@ const needsUpgrade = (currentVersion, desiredVersion) => {
     parsedCurrentVersion = parseCommitOrSemver(currentVersion)
   }
 
-  if (!Semver.valid(parsedCurrentVersion)) {
+  if (!Semver.valid(Semver.coerce(parsedCurrentVersion))) {
     return false
   }
 

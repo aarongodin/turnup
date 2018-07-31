@@ -41,7 +41,7 @@ const updateRepository = async (adapter, repo, packageName, packageVersion, opti
 
     if (currentLockFile !== undefined) {
       repository = repository.set('lockfileEntity', currentLockFile)
-      updatedLockFile = await packages.lockfile.create(formattedPackageDef, currentLockFile.packageManager)
+      updatedLockFile = await packages.lockfile.create(formattedPackageDef, currentLockFile.packageManager, options.registry)
     }
   }
 
