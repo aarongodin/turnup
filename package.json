@@ -33,7 +33,6 @@
     "async": "^2.6.0",
     "chalk": "^2.3.2",
     "colors": "^1.2.1",
-    "express": "^4.16.3",
     "find-up": "^2.1.0",
     "format-package": "^4.2.0",
     "immutable": "^3.8.2",
