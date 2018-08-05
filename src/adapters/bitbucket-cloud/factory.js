@@ -5,12 +5,12 @@ const _get = require('lodash.get')
 class Factory {
   async getConfig() {
     const c = await globalConfig.load()
-    return _get(c, 'adapters.credentials.bitbucket')
+    return _get(c, 'adapters.credentials.bitbucketCloud')
   }
 
   async ensure() {
     const config = await this.getConfig()
-    return config !== undefined && config.token !== undefined && config.baseUrl
+    return config !== undefined && config.consumerKey && config.baseUrl && config.consumerSecret
   }
 
   async createFromCli() {

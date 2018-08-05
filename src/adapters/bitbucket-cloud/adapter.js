@@ -20,11 +20,11 @@ class BitbucketAdapter {
   }
 
   getName() {
-    return 'Bitbucket'
+    return 'Bitbucket Cloud'
   }
 
   getKey() {
-    return 'bitbucket'
+    return 'bitbucket-cloud'
   }
 
   async fetchRepositories(nameList) {
@@ -37,9 +37,9 @@ class BitbucketAdapter {
   }
 
   async fetchRepositoriesByOwner(owner) {
-    let ownerRepos = await this.api.getRepos(owner)
+    const ownerRepos = await this.api.getRepos(owner)
 
-    return Immutable.List(ownerRepos.map(createRepositoryEntity))
+    return Immutable.List(ownerRepos.values.map(createRepositoryEntity))
   }
 
   async fetchPackageDefinitions(repositories) {
@@ -83,13 +83,13 @@ class BitbucketAdapter {
   }
 
   async getPackageJson(repository) {
-    const [decoded, meta] = await Promise.all([
+    const [raw, meta] = await Promise.all([
       this.api.getContents(repository.fullName, repository.defaultBranch, 'package.json'),
       this.api.getFileMeta(repository.fullName, repository.defaultBranch, 'package.json')
     ])
 
     return {
-      decoded,
+      decoded: JSON.parse(raw),
       sha: get(meta, ['commit', 'hash'], null)
     }
   }

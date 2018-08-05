@@ -4,7 +4,9 @@ module.exports = Immutable.Record({
   name: '',
   fullName: '',
   defaultBranch: '',
+  latestCommit: '',
   packageDefinition: null,
   lockfileEntity: null,
-  dependencyRelationship: {}
+  dependencyRelationship: {},
+  projectName: ''
 })
