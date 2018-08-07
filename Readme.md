@@ -31,7 +31,7 @@ The `update` command asks which repositories to update and generates new lock fi
 
 ## Adapters
 
-Adapters are the method by which turnup interacts with SCM hosts. Turnup supports **GitHub**, **GitLab**, and **Bitbucket**.
+Adapters are the method by which turnup interacts with SCM hosts. Turnup supports **GitHub**, **GitLab**, **Bitbucket Cloud**, and **Bitbucket Server**.
 
 ## Guide
 
