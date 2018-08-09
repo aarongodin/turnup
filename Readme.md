@@ -67,9 +67,11 @@ A required option is any option that specifies target repositories.
 | `--repos` | `-r`  | Array of full repository names (owner/name) |
 | `--owner` | `-o`  | Single owner to find repositories           |
 
-### Updating all modules
+### Updating All Modules
 
-By running the update-all command you can easily run npm update on many repositories with a single cli call.
+The `update-all` command runs `update` against all modules in the repository's `package.json` (by running `npm update`). It accepts the same arguments as the `update` command.
+
+For example:
 
 ```sh
 > turnup update-all --owner <owner>
