@@ -7,6 +7,7 @@ const packages = require('../packages')
 const { errorTypes, fatal } = require('../errors')
 const { notify } = require('../logging')
 const { promisify } = require('util')
+const uuid = require('uuid')
 
 const ACTION = 'turnup.update'
 const ALL_ACTION = 'turnup.update.all'
@@ -71,7 +72,7 @@ const updateRepository = async (adapter, repo, packageName, packageVersion, opti
 
 const updateRepositoryAll = async (adapter, repository, options) => {
   notify(ALL_ACTION, `Running npm update against ${chalk.italic(repository.fullName)}`)
-  const branchName = `turnup/update-all`
+  const branchName = `turnup/update-all-${uuid.v4().slice(6)}`
   const packageDef = repository.packageDefinition.decoded
 
   commitUpdates(ALL_ACTION, adapter, options, repository, branchName, packageDef, packages.lockfile.update)
