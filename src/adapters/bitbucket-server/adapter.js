@@ -10,7 +10,7 @@ const createRepositoryEntity = (raw) => {
   return new RepositoryEntity({
     name: raw.name,
     projectName: raw.project.key,
-    fullName: `${raw.name}/${raw.project.key}`,
+    fullName: `${raw.project.key}/${raw.name}`,
     defaultBranch: raw.defaultBranch.displayId,
     latestCommit: raw.defaultBranch.latestCommit
   })
