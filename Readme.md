@@ -67,6 +67,16 @@ A required option is any option that specifies target repositories.
 | `--repos` | `-r`  | Array of full repository names (owner/name) |
 | `--owner` | `-o`  | Single owner to find repositories           |
 
+### Updating All Modules
+
+The `update-all` command runs `update` against all modules in the repository's `package.json` (by running `npm update`). It accepts the same arguments as the `update` command.
+
+For example:
+
+```sh
+> turnup update-all --owner <owner>
+```
+
 ### Lockfiles
 
 Generating lockfiles (`package-lock.json`, `yarn.lock`) is the default functionality of the `update` command but can be turned off through the `--no-lockfile` option. Lockfiles are also only generated if it already exists in the repository. You can force generating and committing a lockfile by passing the `--force-lockfile` option with a value of `npm` or `yarn`.

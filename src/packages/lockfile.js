@@ -4,6 +4,13 @@ const { promisify } = require('util')
 const tmp = require('tmp')
 const LockfileEntity = require('../domain/lockfile-entity')
 
+const INSTALL = 'install'
+const UPDATE = 'update'
+const YARN_MAP = {
+  [INSTALL]: INSTALL,
+  [UPDATE]: 'upgrade'
+}
+
 const writeFileAsync = promisify(fs.writeFile)
 const readFileAsync = promisify(fs.readFile)
 
@@ -22,13 +29,26 @@ const generate = async (cwd, command, filename) => {
   return lockFile.toString()
 }
 
-const createWithNpm = (cwd, registry) => {
-  const registryArg = registry ? ` --registry ${registry}` : ''
-  return generate(cwd, `npm install${registryArg} --package-lock-only`, 'package-lock.json')
+const runWithNpm = (cwd, cmd, registry) => {
+  const ordered = ['npm', cmd, '--package-lock-only']
+
+  if (registry) {
+    ordered.push(`--registry ${registry}`)
+  }
+
+  return generate(cwd, ordered.join(' '), 'package-lock.json')
 }
-const createWithYarn = cwd => generate(cwd, 'yarn install', 'yarn.lock')
+const runWithYarn = (cwd, cmd) => generate(cwd, `yarn ${YARN_MAP[cmd]}`, 'yarn.lock')
 
 const create = async (packageDefinition, packageManager, registry) => {
+  return createWithCmd(packageDefinition, packageManager, INSTALL, registry)
+}
+
+const update = async (packageDefinition, packageManager, registry) => {
+  return createWithCmd(packageDefinition, packageManager, UPDATE, registry)
+}
+
+const createWithCmd = async (packageDefinition, packageManager, command, registry) => {
   const tempdir = tmp.dirSync({ unsafeCleanup: true })
   await writeFileAsync(`${tempdir.name}/package.json`, packageDefinition)
 
@@ -36,10 +56,10 @@ const create = async (packageDefinition, packageManager, registry) => {
   let fileName
 
   if (packageManager === 'yarn') {
-    lockFile = await createWithYarn(tempdir.name)
+    lockFile = await runWithYarn(tempdir.name, command)
     fileName = 'yarn.lock'
   } else if (packageManager === 'npm') {
-    lockFile = await createWithNpm(tempdir.name, registry)
+    lockFile = await runWithNpm(tempdir.name, command, registry)
     fileName = 'package-lock.json'
   }
 
@@ -49,10 +69,11 @@ const create = async (packageDefinition, packageManager, registry) => {
   return new LockfileEntity({
     fileContents: lockFile,
     fileName,
-    packageManager
+    packageManager,
   })
 }
 
 module.exports = {
-  create
+  create,
+  update
 }

@@ -3,6 +3,70 @@ const actions = require('./actions')
 const adapters = require('./adapters')
 const { fatal, errorTypes } = require('./errors')
 
+const buildUpdateOptions = (yargs) => {
+  yargs.option('r', {
+    alias: 'repos',
+    describe: 'repos to search against',
+    type: 'string'
+  }).array('repos')
+
+  yargs.option('o', {
+    alias: 'owner',
+    describe: 'owner to search against',
+    type: 'string'
+  })
+
+  yargs.option('a', {
+    alias: 'adapter',
+    describe: 'specify an adapter',
+    choices: adapters.types
+  })
+
+  yargs.option('c', {
+    alias: 'continue',
+    describe: 'do not prompt (run this in CI)',
+    type: 'boolean'
+  })
+
+  yargs.option('no-pr', {
+    describe: 'do not create a pull request / merge request',
+    type: 'boolean'
+  })
+
+  yargs.option('no-lockfile', {
+    describe: 'do not update the lockfile',
+    type: 'boolean'
+  })
+
+  yargs.option('force-lockfile', {
+    describe: 'always generate & commit a lockfile',
+    type: 'boolean'
+  })
+
+  yargs.option('registry', {
+    describe: 'point to another NPM registry for the npm install, does not apply to yarn',
+    type: 'string'
+  })
+}
+
+const mapUpdateOptions = (argv) => {
+  const argKeyMap = {
+    repos: 'repos',
+    owner: 'owner',
+    'no-pr': 'noPullRequest',
+    'no-lockfile': 'noLockfile',
+    'force-lockfile': 'forceLockFile',
+    continue: 'continue',
+    registry: 'registry'
+  }
+
+  return Object.keys(argKeyMap).reduce((accumulator, key) => {
+    accumulator[argKeyMap[key]] = argv[key]
+
+    return accumulator
+  }, {})
+}
+
 const checkUpdateArgs = argv => {
   const ownerRegex = /^[a-zA-Z\d-_]{2,}$/
   const repoRegex = /^[a-zA-Z\d-_]{2,}\/[a-zA-Z\d-_]{2,}$/
@@ -64,70 +128,12 @@ require('yargs')
         describe: 'package name that will be updated across repos',
         type: 'string'
       })
-
-      yargs.option('r', {
-        alias: 'repos',
-        describe: 'repos to search against',
-        type: 'string'
-      }).array('repos')
-
-      yargs.option('o', {
-        alias: 'owner',
-        describe: 'owner to search against',
-        type: 'string'
-      })
-
-      yargs.option('a', {
-        alias: 'adapter',
-        describe: 'specify an adapter',
-        choices: adapters.types
-      })
-
-      yargs.option('c', {
-        alias: 'continue',
-        describe: 'do not prompt (run this in CI)',
-        type: 'boolean'
-      })
-
-      yargs.option('no-pr', {
-        describe: 'do not create a pull request / merge request',
-        type: 'boolean'
-      })
-
-      yargs.option('no-lockfile', {
-        describe: 'do not update the lockfile',
-        type: 'boolean'
-      })
-
-      yargs.option('force-lockfile', {
-        describe: 'always generate & commit a lockfile',
-        type: 'boolean'
-      })
-
-      yargs.option('registry', {
-        describe: 'point to another NPM registry for the npm install, does not apply to yarn',
-        type: 'string'
-      })
+      buildUpdateOptions(yargs)
     },
     async argv => {
       checkUpdateArgs(argv)
       const adapter = await processAdapter(argv.adapter)
-      const argKeyMap = {
-        repos: 'repos',
-        owner: 'owner',
-        'no-pr': 'noPullRequest',
-        'no-lockfile': 'noLockfile',
-        'force-lockfile': 'forceLockFile',
-        continue: 'continue',
-        registry: 'registry'
-      }
-
-      const options =  Object.keys(argKeyMap).reduce((accumulator, key) => {
-        accumulator[argKeyMap[key]] = argv[key]
-
-        return accumulator
-      }, {})
-
+      const options = mapUpdateOptions(argv)
       actions.update(argv.package, adapter, options)
     }
   )
@@ -159,6 +165,23 @@ require('yargs')
           await adapters.getConfigure(argv.adapter)()
         }
       ).demandCommand()
+    }
+  )
+  .command(
+    'update-all',
+    'run npm update in many repos',
+    yargs => {
+      yargs.positional('package', {
+        describe: 'package name that will be updated across repos',
+        type: 'string'
+      })
+      buildUpdateOptions(yargs)
+    },
+    async argv => {
+      checkUpdateArgs(argv)
+      const adapter = await processAdapter(argv.adapter)
+      const options = mapUpdateOptions(argv)
+      actions.updateAll(adapter, options)
     }
   )
   .demandCommand()
